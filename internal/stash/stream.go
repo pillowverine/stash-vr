@@ -86,7 +86,7 @@ func getSources(ctx context.Context, sps gql.StreamsParts, format string, defaul
 	sourceMap := make(map[int]Source)
 
 	for _, s := range sps.SceneStreams {
-		if strings.Contains(s.Label, format) {
+		if strings.Contains(s.Label, format) && (len(s.Label) != len(format)) {
 			resolution, err := parseResolutionFromLabel(s.Label)
 			if err != nil {
 				log.Ctx(ctx).Warn().Err(err).Str("label", s.Label).Msg("Failed to parse resolution from label")
@@ -102,6 +102,11 @@ func getSources(ctx context.Context, sps gql.StreamsParts, format string, defaul
 				Url:        s.Url,
 			}
 		} else if s.Label == defaultSourceLabel {
+			sourceMap[sps.Files[0].Height] = Source{
+				Resolution: sps.Files[0].Height,
+				Url:        s.Url,
+			}
+		} else {
 			sourceMap[sps.Files[0].Height] = Source{
 				Resolution: sps.Files[0].Height,
 				Url:        s.Url,
